@@ -1,0 +1,376 @@
+.compliance-results {
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.compliance-summary {
+  display: flex;
+  align-items: center;
+  padding: 20px;
+  border-radius: 12px;
+  margin-bottom: 20px;
+  border: 2px solid;
+}
+
+.compliance-summary.compliant {
+  background-color: #d4edda;
+  border-color: #28a745;
+  color: #155724;
+}
+
+.compliance-summary.non-compliant {
+  background-color: #f8d7da;
+  border-color: #dc3545;
+  color: #721c24;
+}
+
+.compliance-icon {
+  font-size: 3rem;
+  margin-right: 15px;
+}
+
+.compliance-text h2 {
+  margin: 0 0 10px 0;
+  font-size: 1.5rem;
+}
+
+.compliance-message {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 500;
+}
+
+.compliance-actions {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.details-toggle,
+.new-scan-button {
+  flex: 1;
+  min-width: 140px;
+  padding: 12px 16px;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.details-toggle {
+  background-color: #6c757d;
+  color: white;
+}
+
+.details-toggle:hover {
+  background-color: #5a6268;
+  transform: translateY(-1px);
+}
+
+.new-scan-button {
+  background-color: #007bff;
+  color: white;
+}
+
+.new-scan-button:hover {
+  background-color: #0056b3;
+  transform: translateY(-1px);
+}
+
+.compliance-details {
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.compliance-details h3 {
+  margin: 0 0 15px 0;
+  color: #333;
+}
+
+.requirements-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.requirement-item {
+  background-color: white;
+  border-radius: 8px;
+  padding: 15px;
+  border-left: 4px solid;
+}
+
+.requirement-item.passed {
+  border-left-color: #28a745;
+}
+
+.requirement-item.failed {
+  border-left-color: #dc3545;
+}
+
+.requirement-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.requirement-icon {
+  font-size: 1.2rem;
+  margin-right: 8px;
+}
+
+.requirement-name {
+  font-weight: 600;
+  color: #333;
+}
+
+.requirement-details {
+  color: #666;
+}
+
+.requirement-values {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 5px;
+  flex-wrap: wrap;
+}
+
+.actual-value,
+.required-value {
+  font-size: 0.9rem;
+  padding: 4px 8px;
+  border-radius: 4px;
+  background-color: #f1f1f1;
+}
+
+.requirement-explanation {
+  margin: 5px 0 0 0;
+  font-size: 0.9rem;
+  font-style: italic;
+}
+
+.non-compliance-summary {
+  background-color: #fff3cd;
+  border: 1px solid #ffeaa7;
+  border-radius: 8px;
+  padding: 15px;
+  margin-top: 20px;
+}
+
+.non-compliance-summary h3 {
+  margin: 0 0 10px 0;
+  color: #856404;
+}
+
+.non-compliance-summary ul {
+  margin: 0;
+  padding-left: 20px;
+}
+
+.non-compliance-summary li {
+  margin-bottom: 8px;
+  color: #856404;
+}
+
+.non-compliance-summary strong {
+  color: #721c24;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .compliance-results {
+    padding: 15px;
+    max-width: 100%;
+  }
+  
+  .compliance-summary {
+    padding: 15px;
+    margin-bottom: 15px;
+  }
+  
+  .compliance-text h2 {
+    font-size: 1.3rem;
+  }
+  
+  .compliance-message {
+    font-size: 1rem;
+  }
+  
+  .compliance-actions {
+    gap: 8px;
+    margin-bottom: 15px;
+  }
+  
+  .details-toggle,
+  .new-scan-button {
+    min-width: 120px;
+    padding: 10px 14px;
+    font-size: 0.9rem;
+  }
+  
+  .compliance-details {
+    padding: 15px;
+    margin-bottom: 15px;
+  }
+  
+  .requirements-list {
+    gap: 12px;
+  }
+  
+  .requirement-item {
+    padding: 12px;
+  }
+  
+  .requirement-values {
+    gap: 10px;
+  }
+  
+  .non-compliance-summary {
+    padding: 12px;
+    margin-top: 15px;
+  }
+}
+
+@media (max-width: 480px) {
+  .compliance-results {
+    padding: 10px;
+  }
+  
+  .compliance-summary {
+    flex-direction: column;
+    text-align: center;
+    padding: 15px;
+  }
+  
+  .compliance-icon {
+    margin-right: 0;
+    margin-bottom: 10px;
+    font-size: 2.5rem;
+  }
+  
+  .compliance-text h2 {
+    font-size: 1.2rem;
+    margin-bottom: 8px;
+  }
+  
+  .compliance-message {
+    font-size: 0.95rem;
+  }
+  
+  .compliance-actions {
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 15px;
+  }
+  
+  .details-toggle,
+  .new-scan-button {
+    width: 100%;
+    min-width: auto;
+    padding: 12px 16px;
+    font-size: 0.9rem;
+  }
+  
+  .compliance-details {
+    padding: 12px;
+  }
+  
+  .compliance-details h3 {
+    font-size: 1rem;
+    margin-bottom: 12px;
+  }
+  
+  .requirements-list {
+    gap: 10px;
+  }
+  
+  .requirement-item {
+    padding: 10px;
+  }
+  
+  .requirement-header {
+    margin-bottom: 6px;
+  }
+  
+  .requirement-icon {
+    font-size: 1.1rem;
+  }
+  
+  .requirement-name {
+    font-size: 0.9rem;
+  }
+  
+  .requirement-values {
+    flex-direction: column;
+    gap: 5px;
+    margin-bottom: 8px;
+  }
+  
+  .actual-value,
+  .required-value {
+    font-size: 0.8rem;
+    padding: 3px 6px;
+    width: fit-content;
+  }
+  
+  .requirement-explanation {
+    font-size: 0.8rem;
+    margin-top: 8px;
+  }
+  
+  .non-compliance-summary {
+    padding: 10px;
+    margin-top: 15px;
+  }
+  
+  .non-compliance-summary h3 {
+    font-size: 0.9rem;
+    margin-bottom: 8px;
+  }
+  
+  .non-compliance-summary ul {
+    padding-left: 15px;
+  }
+  
+  .non-compliance-summary li {
+    margin-bottom: 6px;
+    font-size: 0.85rem;
+    line-height: 1.3;
+  }
+}
+
+/* Extra small screens */
+@media (max-width: 360px) {
+  .compliance-results {
+    padding: 8px;
+  }
+  
+  .compliance-summary {
+    padding: 12px;
+  }
+  
+  .compliance-icon {
+    font-size: 2rem;
+  }
+  
+  .compliance-text h2 {
+    font-size: 1.1rem;
+  }
+  
+  .compliance-message {
+    font-size: 0.9rem;
+  }
+  
+  .details-toggle,
+  .new-scan-button {
+    padding: 10px 12px;
+    font-size: 0.85rem;
+  }
+}

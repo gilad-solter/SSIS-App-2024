@@ -1,0 +1,495 @@
+/* Mobile-first responsive design */
+* {
+  box-sizing: border-box;
+}
+
+.app {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  max-width: 100vw;
+  padding: 0;
+  margin: 0;
+  overflow-x: hidden;
+}
+
+.app-header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 1.5rem 1rem;
+  text-align: center;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.app-header h1 {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.8rem;
+  font-weight: 600;
+}
+
+.app-header p {
+  margin: 0;
+  opacity: 0.9;
+  font-size: 0.9rem;
+}
+
+.app-main {
+  flex: 1;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: calc(100vh - 120px);
+}
+
+/* Camera Capture Styles */
+.camera-capture {
+  width: 100%;
+  max-width: 400px;
+  text-align: center;
+}
+
+.capture-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.capture-button {
+  background: #4CAF50;
+  color: white;
+  border: none;
+  padding: 1rem 2rem;
+  border-radius: 50px;
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+  min-height: 60px;
+}
+
+.capture-button:hover {
+  background: #45a049;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
+}
+
+.capture-button:disabled {
+  background: #cccccc;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.instruction-text {
+  color: #666;
+  font-size: 0.9rem;
+  line-height: 1.4;
+  margin: 0;
+  padding: 0 1rem;
+}
+
+/* Preview Styles */
+.preview-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.captured-image {
+  width: 100%;
+  max-width: 400px;
+  height: auto;
+  border-radius: 10px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+.preview-actions {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.retake-button {
+  background: #ff9800;
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 25px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.retake-button:hover {
+  background: #f57c00;
+}
+
+/* Status Messages */
+.error-message, .loading-message, .success-container, .results-container {
+  text-align: center;
+  padding: 2rem;
+  border-radius: 10px;
+  margin: 1rem 0;
+}
+
+.sub-text {
+  font-size: 0.8rem;
+  opacity: 0.8;
+  margin-top: 0.5rem;
+}
+
+.error-message {
+  background: #ffebee;
+  border: 1px solid #ffcdd2;
+  color: #c62828;
+}
+
+.loading-message {
+  background: #e3f2fd;
+  border: 1px solid #bbdefb;
+  color: #1565c0;
+}
+
+.success-container {
+  background: #e8f5e8;
+  border: 1px solid #c8e6c9;
+  color: #2e7d32;
+}
+
+.new-scan-button {
+  background: #2196F3;
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 25px;
+  cursor: pointer;
+  margin-top: 1rem;
+  transition: background 0.3s ease;
+}
+
+.new-scan-button:hover {
+  background: #1976D2;
+}
+
+.uploaded-result p {
+  word-break: break-all;
+  font-size: 0.8rem;
+  color: #666;
+  margin: 1rem 0;
+}
+
+/* Nutritional Data Styles */
+.results-container {
+  background: #f8f9fa;
+  border: 1px solid #dee2e6;
+  color: #333;
+  max-width: 500px;
+  margin: 1rem auto;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.nutritional-results h2 {
+  color: #2c3e50;
+  margin-bottom: 1.5rem;
+}
+
+.product-info {
+  margin-bottom: 2rem;
+  padding: 1rem;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.product-info h3 {
+  color: #2c3e50;
+  margin: 0 0 0.5rem 0;
+  font-size: 1.2rem;
+}
+
+.serving-size {
+  color: #666;
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+.nutrition-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 0.75rem;
+  margin: 1.5rem 0;
+}
+
+.nutrition-item {
+  background: white;
+  padding: 0.75rem;
+  border-radius: 6px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.nutrition-item .label {
+  font-weight: 600;
+  color: #555;
+  font-size: 0.9rem;
+}
+
+.nutrition-item .value {
+  font-weight: 700;
+  color: #2c3e50;
+}
+
+.ingredients-section {
+  background: white;
+  padding: 1rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  margin: 1.5rem 0;
+  text-align: left;
+}
+
+.ingredients-section h4 {
+  color: #2c3e50;
+  margin: 0 0 0.5rem 0;
+  font-size: 1rem;
+}
+
+.ingredients-list {
+  color: #666;
+  font-size: 0.9rem;
+  line-height: 1.4;
+  margin: 0;
+}
+
+.action-buttons {
+  margin-top: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  align-items: center;
+}
+
+.compliance-check-button {
+  background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+  color: white;
+  border: none;
+  padding: 1rem 2rem;
+  border-radius: 25px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+  min-width: 200px;
+}
+
+.compliance-check-button:hover {
+  background: linear-gradient(135deg, #218838 0%, #1e7e34 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(40, 167, 69, 0.4);
+}
+
+/* Test Buttons (Development Only) */
+.test-buttons {
+  margin-top: 3rem;
+  padding: 2rem;
+  background: #f8f9fa;
+  border-radius: 10px;
+  text-align: center;
+}
+
+.test-buttons h3 {
+  color: #6c757d;
+  margin-bottom: 1rem;
+  font-size: 1rem;
+}
+
+.test-button-group {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.test-compliant-button,
+.test-non-compliant-button {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.test-compliant-button {
+  background: #28a745;
+  color: white;
+}
+
+.test-compliant-button:hover {
+  background: #218838;
+  transform: translateY(-1px);
+}
+
+.test-non-compliant-button {
+  background: #dc3545;
+  color: white;
+}
+
+.test-non-compliant-button:hover {
+  background: #c82333;
+  transform: translateY(-1px);
+}
+
+/* Large screens */
+@media (min-width: 769px) {
+  .app-main {
+    max-width: 800px;
+    margin: 0 auto;
+    width: 100%;
+  }
+  
+  .results-container {
+    max-width: 600px;
+  }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .nutrition-grid {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+  }
+  
+  .results-container {
+    margin: 0.5rem auto;
+    max-width: 100%;
+  }
+  
+  .action-buttons {
+    gap: 0.75rem;
+  }
+  
+  .compliance-check-button {
+    min-width: auto;
+    width: 100%;
+  }
+  
+  .test-button-group {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .test-buttons {
+    margin-top: 2rem;
+    padding: 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .app-header {
+    padding: 1rem 0.5rem;
+  }
+  
+  .app-header h1 {
+    font-size: 1.5rem;
+  }
+  
+  .app-main {
+    padding: 0.5rem;
+  }
+  
+  .capture-button {
+    padding: 0.875rem 1.5rem;
+    font-size: 1.1rem;
+  }
+  
+  /* Results view responsive fixes */
+  .results-container {
+    padding: 1rem;
+    margin: 0;
+  }
+  
+  .nutritional-results h2 {
+    font-size: 1.3rem;
+    margin-bottom: 1rem;
+  }
+  
+  .product-info {
+    padding: 0.75rem;
+    margin-bottom: 1rem;
+  }
+  
+  .product-info h3 {
+    font-size: 1.1rem;
+  }
+  
+  .nutrition-grid {
+    gap: 0.5rem;
+    margin: 1rem 0;
+  }
+  
+  .nutrition-item {
+    padding: 0.5rem;
+    flex-direction: column;
+    align-items: flex-start;
+    text-align: left;
+  }
+  
+  .nutrition-item .label {
+    font-size: 0.8rem;
+    margin-bottom: 0.25rem;
+  }
+  
+  .nutrition-item .value {
+    font-size: 1rem;
+  }
+  
+  .ingredients-section {
+    padding: 0.75rem;
+    margin: 1rem 0;
+  }
+  
+  .ingredients-section h4 {
+    font-size: 0.9rem;
+  }
+  
+  .ingredients-list {
+    font-size: 0.8rem;
+  }
+  
+  .action-buttons {
+    margin-top: 1.5rem;
+    gap: 0.75rem;
+  }
+  
+  .compliance-check-button,
+  .new-scan-button {
+    width: 100%;
+    padding: 0.875rem 1rem;
+    font-size: 1rem;
+  }
+  
+  /* Test buttons responsive */
+  .test-buttons {
+    margin-top: 1.5rem;
+    padding: 1rem;
+  }
+  
+  .test-buttons h3 {
+    font-size: 0.9rem;
+  }
+  
+  .test-compliant-button,
+  .test-non-compliant-button {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    font-size: 0.9rem;
+  }
+}
