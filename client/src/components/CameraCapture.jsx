@@ -36,7 +36,7 @@ const CameraCapture = ({ onImageCapture, onUploadComplete }) => {
             ref={fileInputRef}
             type="file"
             accept="image/*"
-            capture="environment"
+            capture
             style={{ display: 'none' }}
             onChange={handleFileSelect}
           />
