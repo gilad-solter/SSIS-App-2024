@@ -10,37 +10,67 @@ const getApiKey = () => {
 // Test API key validity
 export const testApiKey = async (apiKey) => {
   try {
-    const response = await fetch(`${BACKEND_API_URL}/health`, {
-      method: 'GET',
+    console.log('Testing API key validity...');
+    
+    // Test with actual API endpoint using empty data to trigger validation
+    const response = await fetch(`${BACKEND_API_URL}/api/claude/extract-base64`, {
+      method: 'POST',
       headers: {
+        'Content-Type': 'application/json',
         'x-api-key': apiKey
-      }
+      },
+      body: JSON.stringify({ imageBase64: '', mimeType: 'image/jpeg' })
     });
     
+    console.log('API key test response status:', response.status);
+    
     if (response.status === 401) {
-      return { valid: false, error: 'Invalid API key' };
-    } else if (response.status === 404) {
-      // Health endpoint doesn't require API key, so test with actual API endpoint
-      const testResponse = await fetch(`${BACKEND_API_URL}/api/claude/extract-base64`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-api-key': apiKey
-        },
-        body: JSON.stringify({ imageBase64: '', mimeType: 'image/jpeg' })
-      });
-      
-      if (testResponse.status === 401) {
-        return { valid: false, error: 'Invalid API key' };
-      } else if (testResponse.status === 400) {
-        // 400 means API key was accepted but request was bad (which is expected)
+      const errorData = await response.json().catch(() => ({}));
+      console.log('API key validation failed:', errorData);
+      return { 
+        valid: false, 
+        error: errorData.error || 'Invalid API key' 
+      };
+    } else if (response.status === 400) {
+      // 400 with "Base64 image data is required" means API key was accepted
+      const responseData = await response.json().catch(() => ({}));
+      if (responseData.error && responseData.error.includes('Base64 image data is required')) {
+        console.log('API key is valid (got expected validation error for empty data)');
         return { valid: true };
       }
+    } else if (response.status === 429) {
+      // Rate limited but API key was accepted
+      console.log('API key is valid (rate limited)');
+      return { valid: true };
     }
     
+    // If we get any other response, the API key was likely accepted
+    // but let's be safe and try to parse the response
+    const responseData = await response.json().catch(() => ({}));
+    console.log('API key test response data:', responseData);
+    
+    // If we get a specific validation error about image data, key is valid
+    if (responseData.error && responseData.error.includes('Base64 image data is required')) {
+      return { valid: true };
+    }
+    
+    // Default to valid if we made it this far without a 401
     return { valid: true };
+    
   } catch (error) {
-    return { valid: false, error: 'Unable to verify API key. Please check your connection.' };
+    console.error('API key test failed:', error);
+    
+    if (error.message?.includes('Failed to fetch')) {
+      return { 
+        valid: false, 
+        error: 'Unable to connect to server. Please check your connection.' 
+      };
+    }
+    
+    return { 
+      valid: false, 
+      error: 'Unable to verify API key. Please try again.' 
+    };
   }
 };
 

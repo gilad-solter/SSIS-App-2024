@@ -3,6 +3,7 @@ import { useState } from 'react'
 function ApiKeyInput({ onApiKeySubmit, error }) {
   const [apiKey, setApiKey] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [validationMessage, setValidationMessage] = useState('')
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -11,8 +12,12 @@ function ApiKeyInput({ onApiKeySubmit, error }) {
     }
     
     setIsSubmitting(true)
+    setValidationMessage('🔐 Validating API key...')
+    
     await onApiKeySubmit(apiKey.trim())
+    
     setIsSubmitting(false)
+    setValidationMessage('')
   }
 
   return (
@@ -24,6 +29,12 @@ function ApiKeyInput({ onApiKeySubmit, error }) {
         {error && (
           <div className="error-message">
             <p>❌ {error}</p>
+          </div>
+        )}
+        
+        {validationMessage && (
+          <div className="validation-message">
+            <p>{validationMessage}</p>
           </div>
         )}
         

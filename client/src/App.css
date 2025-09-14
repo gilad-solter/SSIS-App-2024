@@ -710,3 +710,17 @@
 .logout-button:hover {
   background: #c82333 !important;
 }
+
+.validation-message {
+  margin: 1rem 0;
+  padding: 0.75rem;
+  background: #e3f2fd;
+  border: 1px solid #90caf9;
+  border-radius: 6px;
+  color: #1565c0;
+}
+
+.validation-message p {
+  margin: 0;
+  font-size: 0.9rem;
+}
