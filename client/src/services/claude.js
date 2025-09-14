@@ -4,8 +4,15 @@ const BACKEND_API_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:30
 
 export const extractNutritionalDataFromBase64 = async (imageBase64, mimeType) => {
   try {
+    console.log('=== Claude API Debug Info ===');
+    console.log('Environment variables:', {
+      VITE_BACKEND_URL: import.meta.env.VITE_BACKEND_URL,
+      NODE_ENV: import.meta.env.NODE_ENV,
+      MODE: import.meta.env.MODE
+    });
+    console.log('Resolved BACKEND_API_URL:', BACKEND_API_URL);
+    console.log('Full API endpoint URL:', `${BACKEND_API_URL}/api/claude/extract-base64`);
     console.log('Starting Claude API text extraction from base64 image');
-    console.log('Using backend API at:', BACKEND_API_URL);
     console.log('Image size:', imageBase64.length, 'characters');
     console.log('MIME type:', mimeType);
 
