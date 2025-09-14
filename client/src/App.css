@@ -622,3 +622,91 @@
     font-size: 0.9rem;
   }
 }
+
+/* API Key Input Styles */
+.api-key-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 70vh;
+  padding: 2rem;
+}
+
+.api-key-modal {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+  padding: 2.5rem;
+  width: 100%;
+  max-width: 400px;
+  text-align: center;
+}
+
+.api-key-modal h2 {
+  margin: 0 0 1rem 0;
+  color: #333;
+  font-size: 1.5rem;
+}
+
+.api-key-modal p {
+  margin: 0 0 1.5rem 0;
+  color: #666;
+  line-height: 1.5;
+}
+
+.input-group {
+  margin: 1.5rem 0;
+}
+
+.api-key-input {
+  width: 100%;
+  padding: 1rem;
+  border: 2px solid #e1e8ed;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: border-color 0.3s ease;
+}
+
+.api-key-input:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.api-key-submit {
+  width: 100%;
+  padding: 1rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.3s ease;
+}
+
+.api-key-submit:hover:not(:disabled) {
+  opacity: 0.9;
+}
+
+.api-key-submit:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.api-key-info {
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #e1e8ed;
+}
+
+.api-key-info p {
+  margin: 0.5rem 0;
+  font-size: 0.85rem;
+  color: #888;
+}
+
+.logout-button:hover {
+  background: #c82333 !important;
+}

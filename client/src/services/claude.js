@@ -2,6 +2,48 @@
 
 const BACKEND_API_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3001';
 
+// Get API key from localStorage
+const getApiKey = () => {
+  return localStorage.getItem('ssisApiKey');
+};
+
+// Test API key validity
+export const testApiKey = async (apiKey) => {
+  try {
+    const response = await fetch(`${BACKEND_API_URL}/health`, {
+      method: 'GET',
+      headers: {
+        'x-api-key': apiKey
+      }
+    });
+    
+    if (response.status === 401) {
+      return { valid: false, error: 'Invalid API key' };
+    } else if (response.status === 404) {
+      // Health endpoint doesn't require API key, so test with actual API endpoint
+      const testResponse = await fetch(`${BACKEND_API_URL}/api/claude/extract-base64`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': apiKey
+        },
+        body: JSON.stringify({ imageBase64: '', mimeType: 'image/jpeg' })
+      });
+      
+      if (testResponse.status === 401) {
+        return { valid: false, error: 'Invalid API key' };
+      } else if (testResponse.status === 400) {
+        // 400 means API key was accepted but request was bad (which is expected)
+        return { valid: true };
+      }
+    }
+    
+    return { valid: true };
+  } catch (error) {
+    return { valid: false, error: 'Unable to verify API key. Please check your connection.' };
+  }
+};
+
 export const extractNutritionalDataFromBase64 = async (imageBase64, mimeType) => {
   try {
     console.log('=== Claude API Debug Info ===');
@@ -21,12 +63,18 @@ export const extractNutritionalDataFromBase64 = async (imageBase64, mimeType) =>
       mimeType: mimeType || 'image/jpeg'
     };
 
+    const apiKey = getApiKey();
+    if (!apiKey) {
+      throw new Error('API key not found. Please provide a valid API key.');
+    }
+
     console.log('Sending base64 image to backend proxy...');
 
     const response = await fetch(`${BACKEND_API_URL}/api/claude/extract-base64`, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'x-api-key': apiKey
       },
       body: JSON.stringify(requestBody)
     });
@@ -50,10 +98,12 @@ export const extractNutritionalDataFromBase64 = async (imageBase64, mimeType) =>
     let errorMessage = error.message || 'Failed to extract text from image';
     
     // Handle specific API errors
-    if (error.message?.includes('Claude API key not configured')) {
+    if (error.message?.includes('API key not found')) {
+      errorMessage = 'API key missing. Please provide a valid API key.';
+    } else if (error.message?.includes('Invalid API key') || error.message?.includes('401')) {
+      errorMessage = 'Invalid API key. Please check your API key and try again.';
+    } else if (error.message?.includes('Claude API key not configured')) {
       errorMessage = 'Server configuration error: Claude API key missing.';
-    } else if (error.message?.includes('401')) {
-      errorMessage = 'Invalid Claude API key. Please check your server configuration.';
     } else if (error.message?.includes('429')) {
       errorMessage = 'API rate limit exceeded. Please try again later.';
     } else if (error.message?.includes('413')) {

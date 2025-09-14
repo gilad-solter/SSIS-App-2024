@@ -1,7 +1,8 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import CameraCapture from './components/CameraCapture'
 import ComplianceResults from './components/ComplianceResults'
-import { extractNutritionalDataFromBase64 } from './services/claude'
+import ApiKeyInput from './components/ApiKeyInput'
+import { extractNutritionalDataFromBase64, testApiKey } from './services/claude'
 import './App.css'
 
 // Test data for development
@@ -40,6 +41,47 @@ function App() {
   const [compressionStatus, setCompressionStatus] = useState(null)
   const [debugLogs, setDebugLogs] = useState([])
   const [showDebug, setShowDebug] = useState(false)
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const [apiKeyError, setApiKeyError] = useState(null)
+
+  // Check for stored API key on component mount
+  useEffect(() => {
+    const checkStoredApiKey = async () => {
+      const storedApiKey = localStorage.getItem('ssisApiKey')
+      if (storedApiKey) {
+        const keyValidation = await testApiKey(storedApiKey)
+        if (keyValidation.valid) {
+          setIsAuthenticated(true)
+        } else {
+          setApiKeyError('Stored API key is no longer valid. Please enter a new one.')
+          localStorage.removeItem('ssisApiKey')
+        }
+      }
+    }
+    
+    checkStoredApiKey()
+  }, [])
+
+  // Handle API key submission
+  const handleApiKeySubmit = async (apiKey) => {
+    setApiKeyError(null)
+    
+    const keyValidation = await testApiKey(apiKey)
+    if (keyValidation.valid) {
+      localStorage.setItem('ssisApiKey', apiKey)
+      setIsAuthenticated(true)
+    } else {
+      setApiKeyError(keyValidation.error || 'Invalid API key. Please try again.')
+    }
+  }
+
+  // Handle logout (clear API key)
+  const handleLogout = () => {
+    localStorage.removeItem('ssisApiKey')
+    setIsAuthenticated(false)
+    setApiKeyError(null)
+    resetApp()
+  }
 
   // Custom logger that shows on mobile
   const mobileLog = (message, type = 'info') => {
@@ -241,11 +283,42 @@ function App() {
     setError(null)
   }
 
+  // If not authenticated, show API key input
+  if (!isAuthenticated) {
+    return (
+      <div className="app">
+        <header className="app-header">
+          <h1>SSIS Compliance Checker</h1>
+          <p>Secure access required</p>
+        </header>
+        <ApiKeyInput onApiKeySubmit={handleApiKeySubmit} error={apiKeyError} />
+      </div>
+    )
+  }
+
   return (
     <div className="app">
       <header className="app-header">
         <h1>SSIS Compliance Checker</h1>
         <p>Take a photo of nutritional labels to check SSIS compliance</p>
+        <button 
+          onClick={handleLogout}
+          className="logout-button"
+          style={{
+            position: 'absolute',
+            top: '10px',
+            left: '10px',
+            background: '#dc3545',
+            color: 'white',
+            border: 'none',
+            borderRadius: '4px',
+            padding: '8px 12px',
+            fontSize: '12px',
+            cursor: 'pointer'
+          }}
+        >
+          🔓 Logout
+        </button>
       </header>
 
       <main className="app-main">

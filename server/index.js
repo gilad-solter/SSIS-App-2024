@@ -22,6 +22,35 @@ const apiLimiter = rateLimit({
 // Apply rate limiting to all API routes
 app.use('/api/', apiLimiter);
 
+// API Key authentication middleware
+const authenticateApiKey = (req, res, next) => {
+  const apiKey = req.headers['x-api-key'];
+  const validApiKey = process.env.API_SECRET_KEY;
+  
+  if (!validApiKey) {
+    return res.status(500).json({ 
+      error: 'Server configuration error: API key not configured' 
+    });
+  }
+  
+  if (!apiKey) {
+    return res.status(401).json({ 
+      error: 'Missing API key. Please provide x-api-key header.' 
+    });
+  }
+  
+  if (apiKey !== validApiKey) {
+    return res.status(401).json({ 
+      error: 'Invalid API key. Access denied.' 
+    });
+  }
+  
+  next();
+};
+
+// Apply API key authentication to all API routes
+app.use('/api/', authenticateApiKey);
+
 // Middleware
 app.use(cors({
   origin: [
