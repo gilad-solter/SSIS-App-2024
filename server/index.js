@@ -58,7 +58,9 @@ app.use(cors({
     'http://localhost:5174', 
     'https://client-production-7bb8.up.railway.app'
   ], // Vite dev server + production client
-  credentials: true
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'x-api-key', 'Authorization']
 }));
 app.use(express.json({ limit: '10mb' }));
 
