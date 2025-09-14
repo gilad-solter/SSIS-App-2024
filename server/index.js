@@ -7,7 +7,11 @@ const PORT = process.env.PORT || 3001;
 
 // Middleware
 app.use(cors({
-  origin: ['http://localhost:5173', 'http://localhost:5174'], // Vite dev server
+  origin: [
+    'http://localhost:5173', 
+    'http://localhost:5174', 
+    'https://client-production-7bb8.up.railway.app'
+  ], // Vite dev server + production client
   credentials: true
 }));
 app.use(express.json({ limit: '10mb' }));
