@@ -6,6 +6,9 @@ require('dotenv').config();
 const app = express();
 const PORT = process.env.PORT || 3001;
 
+// Trust proxy for accurate IP addresses in production (Railway, Heroku, etc.)
+app.set('trust proxy', 1);
+
 // Rate limiting middleware - configurable requests per hour per IP
 const RATE_LIMIT_MAX = parseInt(process.env.RATE_LIMIT_PER_HOUR) || 10;
 const apiLimiter = rateLimit({
