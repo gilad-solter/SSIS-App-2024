@@ -1,9 +1,26 @@
 const express = require('express');
 const cors = require('cors');
+const rateLimit = require('express-rate-limit');
 require('dotenv').config();
 
 const app = express();
 const PORT = process.env.PORT || 3001;
+
+// Rate limiting middleware - configurable requests per hour per IP
+const RATE_LIMIT_MAX = parseInt(process.env.RATE_LIMIT_PER_HOUR) || 10;
+const apiLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000, // 1 hour
+  max: RATE_LIMIT_MAX, // limit each IP to configurable requests per windowMs
+  message: {
+    error: 'Too many requests from this IP, please try again later.',
+    retryAfter: '1 hour'
+  },
+  standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
+  legacyHeaders: false, // Disable the `X-RateLimit-*` headers
+});
+
+// Apply rate limiting to all API routes
+app.use('/api/', apiLimiter);
 
 // Middleware
 app.use(cors({
@@ -154,4 +171,5 @@ app.get('/health', (req, res) => {
 app.listen(PORT, () => {
   console.log(`🚀 SSIS Server running on port ${PORT}`);
   console.log(`📡 Claude API proxy available at http://localhost:${PORT}/api/claude/extract`);
+  console.log(`🛡️ Rate limiting: ${RATE_LIMIT_MAX} requests per hour per IP`);
 });
