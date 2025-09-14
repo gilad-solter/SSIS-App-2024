@@ -38,8 +38,18 @@ function App() {
   const [error, setError] = useState(null)
   const [showCompliance, setShowCompliance] = useState(false)
   const [compressionStatus, setCompressionStatus] = useState(null)
+  const [debugLogs, setDebugLogs] = useState([])
+  const [showDebug, setShowDebug] = useState(false)
 
-  const compressImage = async (file, targetSizeMB = 4.0, maxAttempts = 6) => {
+  // Custom logger that shows on mobile
+  const mobileLog = (message, type = 'info') => {
+    const timestamp = new Date().toLocaleTimeString()
+    const logEntry = { timestamp, message, type }
+    setDebugLogs(prev => [...prev.slice(-9), logEntry]) // Keep last 10 logs
+    console.log(message) // Still log to console too
+  }
+
+  const compressImage = async (file, targetSizeMB = 4.0, maxAttempts = 6, logger = console.log) => {
     return new Promise((resolve, reject) => {
       const canvas = document.createElement('canvas')
       const ctx = canvas.getContext('2d')
@@ -47,7 +57,7 @@ function App() {
       
       img.onload = async () => {
         const originalSizeMB = file.size / 1024 / 1024
-        console.log(`Starting compression: ${originalSizeMB.toFixed(2)}MB → target: ${targetSizeMB}MB`)
+        logger(`🔄 Starting compression: ${originalSizeMB.toFixed(2)}MB → target: ${targetSizeMB}MB`)
         
         let currentFile = file
         let quality = 0.9
@@ -80,15 +90,15 @@ function App() {
           })
           
           const compressedSizeMB = blob.size / 1024 / 1024
-          console.log(`🔄 Compression attempt ${attempt}/${maxAttempts}: ${compressedSizeMB.toFixed(2)}MB (quality: ${quality.toFixed(2)}, dimensions: ${width}x${height})`)
+          logger(`🔄 Attempt ${attempt}/${maxAttempts}: ${compressedSizeMB.toFixed(2)}MB (q:${quality.toFixed(2)}, ${width}x${height})`)
           
           if (compressedSizeMB <= targetSizeMB) {
             const compressedFile = new File([blob], file.name, { type: blob.type })
-            console.log(`✅ COMPRESSION SUCCESS: ${originalSizeMB.toFixed(2)}MB → ${compressedSizeMB.toFixed(2)}MB in ${attempt} attempts`)
+            logger(`✅ SUCCESS: ${originalSizeMB.toFixed(2)}MB → ${compressedSizeMB.toFixed(2)}MB in ${attempt} attempts`)
             resolve(compressedFile)
             return
           } else {
-            console.log(`❌ Attempt ${attempt} failed - size still ${compressedSizeMB.toFixed(2)}MB > target ${targetSizeMB}MB`)
+            logger(`❌ Attempt ${attempt} failed - still ${compressedSizeMB.toFixed(2)}MB > ${targetSizeMB}MB`)
           }
           
           // Adjust compression parameters for next attempt
@@ -106,7 +116,7 @@ function App() {
         }
         
         // If we get here, compression failed
-        console.log(`❌ Compression failed after ${maxAttempts} attempts`)
+        logger(`❌ Compression failed after ${maxAttempts} attempts`)
         reject(new Error('Unable to compress image below size limit'))
       }
       
@@ -122,15 +132,15 @@ function App() {
     setCompressionStatus(null)
     
     try {
-      console.log('Processing image:', imageFile.name)
+      mobileLog(`📷 Processing image: ${imageFile.name}`, 'info')
       const originalSizeMB = imageFile.size / 1024 / 1024
-      console.log('Original file size:', originalSizeMB.toFixed(2), 'MB')
+      mobileLog(`📏 Original file size: ${originalSizeMB.toFixed(2)}MB`, 'info')
       
       let processedFile = imageFile
       
       // Check if compression is needed and notify user (lower threshold for safety)
       if (originalSizeMB > 3.0) {
-        console.log(`🔄 File size ${originalSizeMB.toFixed(2)}MB exceeds 3MB threshold - starting compression`)
+        mobileLog(`🔄 File size ${originalSizeMB.toFixed(2)}MB exceeds 3MB threshold - starting compression`, 'warning')
         setCompressionStatus({
           type: 'warning',
           message: `⚠️ Image size is ${originalSizeMB.toFixed(2)}MB. Compressing to meet 5MB limit...`
@@ -140,11 +150,11 @@ function App() {
         await new Promise(resolve => setTimeout(resolve, 100))
         
         try {
-          console.log('🔄 Starting image compression...')
-          processedFile = await compressImage(imageFile)
+          mobileLog('🔄 Starting image compression...', 'info')
+          processedFile = await compressImage(imageFile, 4.0, 6, mobileLog)
           
           const compressedSizeMB = processedFile.size / 1024 / 1024
-          console.log(`✅ Compression completed: ${originalSizeMB.toFixed(2)}MB → ${compressedSizeMB.toFixed(2)}MB`)
+          mobileLog(`✅ Compression completed: ${originalSizeMB.toFixed(2)}MB → ${compressedSizeMB.toFixed(2)}MB`, 'success')
           
           setCompressionStatus({
             type: 'success',
@@ -155,7 +165,7 @@ function App() {
           await new Promise(resolve => setTimeout(resolve, 1500))
           
         } catch (compressionError) {
-          console.error('❌ Compression failed:', compressionError)
+          mobileLog(`❌ Compression failed: ${compressionError.message}`, 'error')
           setCompressionStatus({
             type: 'error',
             message: `❌ Unable to compress image below 5MB limit. Please use a smaller image.`
@@ -165,7 +175,7 @@ function App() {
           return
         }
       } else {
-        console.log(`✅ File size ${originalSizeMB.toFixed(2)}MB is acceptable - no compression needed`)
+        mobileLog(`✅ File size ${originalSizeMB.toFixed(2)}MB is acceptable - no compression needed`, 'success')
       }
       
       // Final size validation before API call
@@ -239,6 +249,47 @@ function App() {
       </header>
 
       <main className="app-main">
+        {/* Debug Console Toggle - only show in production for mobile debugging */}
+        <div className="debug-toggle">
+          <button 
+            onClick={() => setShowDebug(!showDebug)}
+            style={{
+              position: 'fixed',
+              top: '10px',
+              right: '10px',
+              background: '#6c757d',
+              color: 'white',
+              border: 'none',
+              borderRadius: '50%',
+              width: '40px',
+              height: '40px',
+              fontSize: '16px',
+              zIndex: 1000,
+              cursor: 'pointer'
+            }}
+          >
+            🐛
+          </button>
+        </div>
+
+        {/* Mobile Debug Console */}
+        {showDebug && (
+          <div className="debug-console">
+            <div className="debug-header">
+              <span>Debug Console</span>
+              <button onClick={() => setDebugLogs([])}>Clear</button>
+            </div>
+            <div className="debug-logs">
+              {debugLogs.map((log, index) => (
+                <div key={index} className={`debug-log ${log.type}`}>
+                  <span className="debug-time">{log.timestamp}</span>
+                  <span className="debug-message">{log.message}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
         {error && (
           <div className="error-message">
             <p>❌ {error}</p>

@@ -93,6 +93,85 @@
   opacity: 0.8;
 }
 
+/* Mobile Debug Console */
+.debug-console {
+  position: fixed;
+  top: 60px;
+  right: 10px;
+  width: 90%;
+  max-width: 400px;
+  max-height: 300px;
+  background: rgba(0, 0, 0, 0.9);
+  color: white;
+  border-radius: 8px;
+  z-index: 999;
+  font-size: 12px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+}
+
+.debug-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 8px 8px 0 0;
+  font-weight: bold;
+}
+
+.debug-header button {
+  background: #dc3545;
+  color: white;
+  border: none;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 10px;
+  cursor: pointer;
+}
+
+.debug-logs {
+  max-height: 240px;
+  overflow-y: auto;
+  padding: 8px;
+}
+
+.debug-log {
+  display: flex;
+  margin-bottom: 4px;
+  padding: 4px;
+  border-radius: 4px;
+  font-family: monospace;
+  font-size: 11px;
+  line-height: 1.2;
+}
+
+.debug-log.info {
+  background: rgba(13, 110, 253, 0.2);
+}
+
+.debug-log.success {
+  background: rgba(25, 135, 84, 0.2);
+}
+
+.debug-log.warning {
+  background: rgba(255, 193, 7, 0.2);
+}
+
+.debug-log.error {
+  background: rgba(220, 53, 69, 0.2);
+}
+
+.debug-time {
+  min-width: 60px;
+  margin-right: 8px;
+  opacity: 0.7;
+}
+
+.debug-message {
+  flex: 1;
+  word-break: break-word;
+}
+
 /* Camera Capture Styles */
 .camera-capture {
   width: 100%;
