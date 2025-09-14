@@ -38,6 +38,44 @@ function App() {
   const [error, setError] = useState(null)
   const [showCompliance, setShowCompliance] = useState(false)
 
+  const compressImage = async (file, maxSizeMB = 4.5) => {
+    return new Promise((resolve) => {
+      const canvas = document.createElement('canvas')
+      const ctx = canvas.getContext('2d')
+      const img = new Image()
+      
+      img.onload = () => {
+        // Calculate compression ratio based on file size
+        const fileSizeMB = file.size / 1024 / 1024
+        let quality = fileSizeMB > maxSizeMB ? (maxSizeMB / fileSizeMB) * 0.8 : 0.9
+        
+        // Set canvas dimensions (optionally resize if too large)
+        const maxWidth = 2048
+        const maxHeight = 2048
+        let { width, height } = img
+        
+        if (width > maxWidth || height > maxHeight) {
+          const ratio = Math.min(maxWidth / width, maxHeight / height)
+          width *= ratio
+          height *= ratio
+        }
+        
+        canvas.width = width
+        canvas.height = height
+        
+        // Draw and compress
+        ctx.drawImage(img, 0, 0, width, height)
+        
+        canvas.toBlob((blob) => {
+          console.log(`Image compressed: ${(file.size / 1024 / 1024).toFixed(2)}MB → ${(blob.size / 1024 / 1024).toFixed(2)}MB`)
+          resolve(new File([blob], file.name, { type: blob.type }))
+        }, file.type, quality)
+      }
+      
+      img.src = URL.createObjectURL(file)
+    })
+  }
+
   const handleImageCapture = async (imageFile) => {
     setIsProcessing(true)
     setError(null)
@@ -45,18 +83,27 @@ function App() {
     
     try {
       console.log('Processing image:', imageFile.name)
+      console.log('Original file size:', (imageFile.size / 1024 / 1024).toFixed(2), 'MB')
+      
+      // Compress image if it's too large
+      let processedFile = imageFile
+      const fileSizeMB = imageFile.size / 1024 / 1024
+      if (fileSizeMB > 4.5) {
+        console.log('Compressing image...')
+        processedFile = await compressImage(imageFile)
+      }
       
       // Convert image to base64 for direct processing
       const reader = new FileReader()
       const imageBase64 = await new Promise((resolve, reject) => {
         reader.onload = () => resolve(reader.result.split(',')[1]) // Remove data:image/jpeg;base64, prefix
         reader.onerror = reject
-        reader.readAsDataURL(imageFile)
+        reader.readAsDataURL(processedFile)
       })
       
       console.log('Image converted to base64, sending to Claude API...')
       
-      const extractionResult = await extractNutritionalDataFromBase64(imageBase64, imageFile.type)
+      const extractionResult = await extractNutritionalDataFromBase64(imageBase64, processedFile.type)
       
       if (extractionResult.success) {
         setNutritionalData(extractionResult.data)
