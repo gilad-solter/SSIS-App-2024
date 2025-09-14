@@ -39,7 +39,7 @@ function App() {
   const [showCompliance, setShowCompliance] = useState(false)
   const [compressionStatus, setCompressionStatus] = useState(null)
 
-  const compressImage = async (file, targetSizeMB = 4.8, maxAttempts = 5) => {
+  const compressImage = async (file, targetSizeMB = 4.0, maxAttempts = 6) => {
     return new Promise((resolve, reject) => {
       const canvas = document.createElement('canvas')
       const ctx = canvas.getContext('2d')
@@ -80,13 +80,15 @@ function App() {
           })
           
           const compressedSizeMB = blob.size / 1024 / 1024
-          console.log(`Compression attempt ${attempt}: ${compressedSizeMB.toFixed(2)}MB (quality: ${quality.toFixed(2)}, dimensions: ${width}x${height})`)
+          console.log(`🔄 Compression attempt ${attempt}/${maxAttempts}: ${compressedSizeMB.toFixed(2)}MB (quality: ${quality.toFixed(2)}, dimensions: ${width}x${height})`)
           
           if (compressedSizeMB <= targetSizeMB) {
             const compressedFile = new File([blob], file.name, { type: blob.type })
-            console.log(`✅ Compression successful: ${originalSizeMB.toFixed(2)}MB → ${compressedSizeMB.toFixed(2)}MB`)
+            console.log(`✅ COMPRESSION SUCCESS: ${originalSizeMB.toFixed(2)}MB → ${compressedSizeMB.toFixed(2)}MB in ${attempt} attempts`)
             resolve(compressedFile)
             return
+          } else {
+            console.log(`❌ Attempt ${attempt} failed - size still ${compressedSizeMB.toFixed(2)}MB > target ${targetSizeMB}MB`)
           }
           
           // Adjust compression parameters for next attempt
@@ -126,24 +128,34 @@ function App() {
       
       let processedFile = imageFile
       
-      // Check if compression is needed and notify user
-      if (originalSizeMB > 4.8) {
+      // Check if compression is needed and notify user (lower threshold for safety)
+      if (originalSizeMB > 3.0) {
+        console.log(`🔄 File size ${originalSizeMB.toFixed(2)}MB exceeds 3MB threshold - starting compression`)
         setCompressionStatus({
           type: 'warning',
-          message: `Image size is ${originalSizeMB.toFixed(2)}MB. Compressing to meet 5MB limit...`
+          message: `⚠️ Image size is ${originalSizeMB.toFixed(2)}MB. Compressing to meet 5MB limit...`
         })
         
+        // Add a small delay to ensure UI updates
+        await new Promise(resolve => setTimeout(resolve, 100))
+        
         try {
-          console.log('Starting image compression...')
+          console.log('🔄 Starting image compression...')
           processedFile = await compressImage(imageFile)
           
           const compressedSizeMB = processedFile.size / 1024 / 1024
+          console.log(`✅ Compression completed: ${originalSizeMB.toFixed(2)}MB → ${compressedSizeMB.toFixed(2)}MB`)
+          
           setCompressionStatus({
             type: 'success',
             message: `✅ Image compressed: ${originalSizeMB.toFixed(2)}MB → ${compressedSizeMB.toFixed(2)}MB`
           })
+          
+          // Keep success message visible for a moment
+          await new Promise(resolve => setTimeout(resolve, 1500))
+          
         } catch (compressionError) {
-          console.error('Compression failed:', compressionError)
+          console.error('❌ Compression failed:', compressionError)
           setCompressionStatus({
             type: 'error',
             message: `❌ Unable to compress image below 5MB limit. Please use a smaller image.`
@@ -152,6 +164,8 @@ function App() {
           setIsProcessing(false)
           return
         }
+      } else {
+        console.log(`✅ File size ${originalSizeMB.toFixed(2)}MB is acceptable - no compression needed`)
       }
       
       // Final size validation before API call
@@ -225,12 +239,6 @@ function App() {
       </header>
 
       <main className="app-main">
-        {compressionStatus && (
-          <div className={`compression-status ${compressionStatus.type}`}>
-            <p>{compressionStatus.message}</p>
-          </div>
-        )}
-
         {error && (
           <div className="error-message">
             <p>❌ {error}</p>
@@ -238,13 +246,19 @@ function App() {
           </div>
         )}
 
+        {compressionStatus && (
+          <div className={`compression-status ${compressionStatus.type}`}>
+            <p>{compressionStatus.message}</p>
+            {compressionStatus.type === 'warning' && (
+              <p className="compression-text">⚙️ Please wait while we reduce the file size...</p>
+            )}
+          </div>
+        )}
+
         {isProcessing && (
           <div className="loading-message">
             <p>🤖 Extracting nutritional data...</p>
             <p className="sub-text">Claude AI is analyzing your image</p>
-            {compressionStatus && compressionStatus.type === 'warning' && (
-              <p className="compression-text">⚙️ Compressing image...</p>
-            )}
           </div>
         )}
 
