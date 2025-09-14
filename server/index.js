@@ -20,13 +20,32 @@ const apiLimiter = rateLimit({
   },
   standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
   legacyHeaders: false, // Disable the `X-RateLimit-*` headers
+  skip: (req) => req.method === 'OPTIONS' // Skip rate limiting for preflight requests
 });
+
+// Middleware - CORS must come first to handle preflight requests
+app.use(cors({
+  origin: [
+    'http://localhost:5173', 
+    'http://localhost:5174', 
+    'https://client-production-7bb8.up.railway.app'
+  ], // Vite dev server + production client
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'x-api-key', 'Authorization']
+}));
+app.use(express.json({ limit: '10mb' }));
 
 // Apply rate limiting to all API routes
 app.use('/api/', apiLimiter);
 
 // API Key authentication middleware
 const authenticateApiKey = (req, res, next) => {
+  // Skip authentication for OPTIONS requests (preflight)
+  if (req.method === 'OPTIONS') {
+    return next();
+  }
+  
   const apiKey = req.headers['x-api-key'];
   const validApiKey = process.env.API_SECRET_KEY;
   
@@ -51,21 +70,8 @@ const authenticateApiKey = (req, res, next) => {
   next();
 };
 
-// Apply API key authentication to all API routes
+// Apply API key authentication to all API routes (after CORS)
 app.use('/api/', authenticateApiKey);
-
-// Middleware
-app.use(cors({
-  origin: [
-    'http://localhost:5173', 
-    'http://localhost:5174', 
-    'https://client-production-7bb8.up.railway.app'
-  ], // Vite dev server + production client
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'x-api-key', 'Authorization']
-}));
-app.use(express.json({ limit: '10mb' }));
 
 // Claude API proxy endpoint for base64 images (new preferred method)
 app.post('/api/claude/extract-base64', async (req, res) => {
