@@ -247,6 +247,7 @@ function App() {
       
       if (extractionResult.success) {
         setNutritionalData(extractionResult.data)
+        setShowCompliance(true) // Automatically show compliance results
         console.log('Nutritional data extracted successfully:', extractionResult.data)
       } else {
         setError(extractionResult.error || 'Failed to extract nutritional data')
@@ -267,19 +268,16 @@ function App() {
     setCompressionStatus(null)
   }
 
-  const handleCheckCompliance = () => {
-    setShowCompliance(true)
-  }
 
   const handleTestCompliant = () => {
     setNutritionalData(testData.compliant)
-    setShowCompliance(false)
+    setShowCompliance(true)
     setError(null)
   }
 
   const handleTestNonCompliant = () => {
     setNutritionalData(testData.nonCompliant)
-    setShowCompliance(false)
+    setShowCompliance(true)
     setError(null)
   }
 
@@ -388,81 +386,11 @@ function App() {
           </div>
         )}
 
-        {nutritionalData ? (
-          showCompliance ? (
-            <ComplianceResults 
-              nutritionalData={nutritionalData}
-              onNewScan={resetApp}
-            />
-          ) : (
-            <div className="results-container">
-              <div className="nutritional-results">
-                <h2>📊 Nutritional Information Extracted</h2>
-                
-                {nutritionalData.productName && (
-                  <div className="product-info">
-                    <h3>{nutritionalData.productName}</h3>
-                    {nutritionalData.servingSize && (
-                      <p className="serving-size">Serving Size: {nutritionalData.servingSize}</p>
-                    )}
-                  </div>
-                )}
-
-                <div className="nutrition-grid">
-                  <div className="nutrition-item">
-                    <span className="label">Calories:</span>
-                    <span className="value">{nutritionalData.calories || 'N/A'}</span>
-                  </div>
-                  <div className="nutrition-item">
-                    <span className="label">Total Fat:</span>
-                    <span className="value">{nutritionalData.totalFat ? `${nutritionalData.totalFat}g` : 'N/A'}</span>
-                  </div>
-                  <div className="nutrition-item">
-                    <span className="label">Saturated Fat:</span>
-                    <span className="value">{nutritionalData.saturatedFat ? `${nutritionalData.saturatedFat}g` : 'N/A'}</span>
-                  </div>
-                  <div className="nutrition-item">
-                    <span className="label">Trans Fat:</span>
-                    <span className="value">{nutritionalData.transFat !== null && nutritionalData.transFat !== undefined ? `${nutritionalData.transFat}g` : 'N/A'}</span>
-                  </div>
-                  <div className="nutrition-item">
-                    <span className="label">Sodium:</span>
-                    <span className="value">{nutritionalData.sodium ? `${nutritionalData.sodium}mg` : 'N/A'}</span>
-                  </div>
-                  <div className="nutrition-item">
-                    <span className="label">Total Sugars:</span>
-                    <span className="value">{nutritionalData.totalSugars ? `${nutritionalData.totalSugars}g` : 'N/A'}</span>
-                  </div>
-                  <div className="nutrition-item">
-                    <span className="label">Protein:</span>
-                    <span className="value">{nutritionalData.protein ? `${nutritionalData.protein}g` : 'N/A'}</span>
-                  </div>
-                  {nutritionalData.servingWeightGrams && (
-                    <div className="nutrition-item">
-                      <span className="label">Serving Weight:</span>
-                      <span className="value">{nutritionalData.servingWeightGrams}g</span>
-                    </div>
-                  )}
-                </div>
-
-                {nutritionalData.ingredients && nutritionalData.ingredients.length > 0 && (
-                  <div className="ingredients-section">
-                    <h4>Ingredients:</h4>
-                    <p className="ingredients-list">{nutritionalData.ingredients.join(', ')}</p>
-                  </div>
-                )}
-
-                <div className="action-buttons">
-                  <button onClick={handleCheckCompliance} className="compliance-check-button">
-                    Check SSIS Compliance
-                  </button>
-                  <button onClick={resetApp} className="new-scan-button">
-                    Scan Another Product
-                  </button>
-                </div>
-              </div>
-            </div>
-          )
+        {nutritionalData && showCompliance ? (
+          <ComplianceResults
+            nutritionalData={nutritionalData}
+            onNewScan={resetApp}
+          />
         ) : (
           !isProcessing && !error && (
             <div>
