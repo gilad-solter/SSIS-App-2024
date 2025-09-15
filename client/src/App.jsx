@@ -322,28 +322,30 @@ function App() {
       </header>
 
       <main className="app-main">
-        {/* Debug Console Toggle - only show in production for mobile debugging */}
-        <div className="debug-toggle">
-          <button 
-            onClick={() => setShowDebug(!showDebug)}
-            style={{
-              position: 'fixed',
-              top: '10px',
-              right: '10px',
-              background: '#6c757d',
-              color: 'white',
-              border: 'none',
-              borderRadius: '50%',
-              width: '40px',
-              height: '40px',
-              fontSize: '16px',
-              zIndex: 1000,
-              cursor: 'pointer'
-            }}
-          >
-            🐛
-          </button>
-        </div>
+        {/* Debug Console Toggle - controlled by environment variable */}
+        {import.meta.env.VITE_SHOW_DEBUG_BUTTON === 'true' && (
+          <div className="debug-toggle">
+            <button
+              onClick={() => setShowDebug(!showDebug)}
+              style={{
+                position: 'fixed',
+                top: '10px',
+                right: '10px',
+                background: '#6c757d',
+                color: 'white',
+                border: 'none',
+                borderRadius: '50%',
+                width: '40px',
+                height: '40px',
+                fontSize: '16px',
+                zIndex: 1000,
+                cursor: 'pointer'
+              }}
+            >
+              🐛
+            </button>
+          </div>
+        )}
 
         {/* Mobile Debug Console */}
         {showDebug && (
