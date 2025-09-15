@@ -3,6 +3,16 @@ import CameraCapture from './components/CameraCapture'
 import ComplianceResults from './components/ComplianceResults'
 import ApiKeyInput from './components/ApiKeyInput'
 import { extractNutritionalDataFromBase64, testApiKey } from './services/claude'
+import {
+  initGA,
+  trackApiKeyView,
+  trackMainView,
+  trackComplianceView,
+  trackApiKeySuccess,
+  trackImageCapture,
+  trackComplianceCheck,
+  trackError
+} from './services/analytics'
 import './App.css'
 
 // Test data for development
@@ -44,34 +54,44 @@ function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [apiKeyError, setApiKeyError] = useState(null)
 
-  // Check for stored API key on component mount
+  // Initialize GA and check for stored API key on component mount
   useEffect(() => {
+    // Initialize Google Analytics
+    initGA()
+
     const checkStoredApiKey = async () => {
       const storedApiKey = localStorage.getItem('ssisApiKey')
       if (storedApiKey) {
         const keyValidation = await testApiKey(storedApiKey)
         if (keyValidation.valid) {
           setIsAuthenticated(true)
+          trackMainView() // Track main view if already authenticated
         } else {
           setApiKeyError('Stored API key is no longer valid. Please enter a new one.')
           localStorage.removeItem('ssisApiKey')
+          trackApiKeyView() // Track API key view for re-authentication
         }
+      } else {
+        trackApiKeyView() // Track API key view for first-time users
       }
     }
-    
+
     checkStoredApiKey()
   }, [])
 
   // Handle API key submission
   const handleApiKeySubmit = async (apiKey) => {
     setApiKeyError(null)
-    
+
     const keyValidation = await testApiKey(apiKey)
     if (keyValidation.valid) {
       localStorage.setItem('ssisApiKey', apiKey)
       setIsAuthenticated(true)
+      trackApiKeySuccess() // Track successful API key validation
+      trackMainView() // Track transition to main view
     } else {
       setApiKeyError(keyValidation.error || 'Invalid API key. Please try again.')
+      trackError('api_key_validation', keyValidation.error || 'Invalid API key')
     }
   }
 
@@ -81,6 +101,7 @@ function App() {
     setIsAuthenticated(false)
     setApiKeyError(null)
     resetApp()
+    trackApiKeyView() // Track return to API key view
   }
 
   // Custom logger that shows on mobile
@@ -172,11 +193,14 @@ function App() {
     setError(null)
     setNutritionalData(null)
     setCompressionStatus(null)
-    
+
     try {
       mobileLog(`📷 Processing image: ${imageFile.name}`, 'info')
       const originalSizeMB = imageFile.size / 1024 / 1024
       mobileLog(`📏 Original file size: ${originalSizeMB.toFixed(2)}MB`, 'info')
+
+      // Track image capture
+      trackImageCapture(imageFile.size)
       
       let processedFile = imageFile
       
@@ -249,12 +273,19 @@ function App() {
         setNutritionalData(extractionResult.data)
         setShowCompliance(true) // Automatically show compliance results
         console.log('Nutritional data extracted successfully:', extractionResult.data)
+
+        // Track compliance check completion and switch to results view
+        const isCompliant = extractionResult.data.isCompliant || false
+        trackComplianceCheck(isCompliant, extractionResult.data.productName)
+        trackComplianceView(isCompliant)
       } else {
         setError(extractionResult.error || 'Failed to extract nutritional data')
+        trackError('data_extraction', extractionResult.error || 'Failed to extract nutritional data')
       }
     } catch (err) {
       console.error('Process error:', err)
       setError('Failed to process image')
+      trackError('image_processing', err.message || 'Failed to process image')
     } finally {
       setIsProcessing(false)
     }
@@ -266,6 +297,7 @@ function App() {
     setIsProcessing(false)
     setShowCompliance(false)
     setCompressionStatus(null)
+    trackMainView() // Track return to main camera view
   }
 
 
