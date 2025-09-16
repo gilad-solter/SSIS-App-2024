@@ -5,6 +5,9 @@ const CameraCapture = ({ onImageCapture, onUploadComplete }) => {
   const [capturedImage, setCapturedImage] = useState(null);
   const fileInputRef = useRef(null);
 
+  // Detect if device is Android (not iOS)
+  const isAndroid = /Android/i.test(navigator.userAgent) && !/iPhone|iPad|iPod/i.test(navigator.userAgent);
+
   const handleCameraClick = async () => {
     // Trigger file input for image capture - this will automatically request camera permission
     fileInputRef.current?.click();
@@ -36,7 +39,7 @@ const CameraCapture = ({ onImageCapture, onUploadComplete }) => {
             ref={fileInputRef}
             type="file"
             accept="image/*"
-            capture="environment"
+            {...(isAndroid && { capture: "environment" })}
             style={{ display: 'none' }}
             onChange={handleFileSelect}
           />
