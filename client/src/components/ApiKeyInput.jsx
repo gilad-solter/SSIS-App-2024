@@ -4,6 +4,7 @@ function ApiKeyInput({ onApiKeySubmit, error }) {
   const [apiKey, setApiKey] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [validationMessage, setValidationMessage] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -40,15 +41,25 @@ function ApiKeyInput({ onApiKeySubmit, error }) {
         
         <form onSubmit={handleSubmit}>
           <div className="input-group">
-            <input
-              type="password"
-              value={apiKey}
-              onChange={(e) => setApiKey(e.target.value)}
-              placeholder="Enter your API key..."
-              required
-              disabled={isSubmitting}
-              className="api-key-input"
-            />
+            <div className="input-with-icon">
+              <input
+                type={showPassword ? "text" : "password"}
+                value={apiKey}
+                onChange={(e) => setApiKey(e.target.value)}
+                placeholder="Enter your API key..."
+                required
+                disabled={isSubmitting}
+                className="api-key-input"
+              />
+              <button
+                type="button"
+                className="password-toggle"
+                onClick={() => setShowPassword(!showPassword)}
+                disabled={isSubmitting}
+              >
+                {showPassword ? '🙈' : '👁️'}
+              </button>
+            </div>
           </div>
           
           <button 
